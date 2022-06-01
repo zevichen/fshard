@@ -20,7 +20,7 @@ pub fn compute(value: &str, algorithm: &str, shards: &u32, vms: &u32) -> u32 {
 }
 
 pub fn hash_ring_get_key(value: &str, shards: &u32, vms: &u32) -> u32 {
-    let mut ring = hashring(shards, vms);
+    let mut ring = hash_ring(shards, vms);
     let mut data = ring.get(&value).expect("在哈希环中未找到对应的值");
     let vec = data.split("&").collect::<Vec<_>>();
     vec[0].parse::<u32>().expect("类型错误，无法将字符转换成整型")
@@ -53,8 +53,8 @@ pub fn fnv1(value: &Vec<u8>) -> u32 {
 /// 哈希环，32或64位
 fn hash_ring(shards: &u32, vms: &u32) -> HashRing<FnvHashBuilder> {
     let mut ring = HashRing::with_hasher(FnvHashBuilder);
-    for i in 0..shards {
-        for j in 0..vms {
+    for i in 0..*shards {
+        for j in 0..*vms {
             let node = format!("{}&VN{}", i, j);
             ring.add(node);
         }
